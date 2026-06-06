@@ -1,8 +1,5 @@
-import uuid
-
 from database.db import insert_fatigue_label
-
-session_id = str(uuid.uuid4())[:8]
+from utils.session import SESSION_ID
 
 
 def start_fatigue_logger():
@@ -22,7 +19,7 @@ def start_fatigue_logger():
                 continue
 
             insert_fatigue_label(
-                session_id,
+                SESSION_ID,
                 fatigue_level
             )
 

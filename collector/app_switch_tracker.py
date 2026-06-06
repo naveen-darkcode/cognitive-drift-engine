@@ -1,13 +1,11 @@
 import time
-import uuid
 
 import win32gui
 import win32process
 import psutil
 
 from database.db import insert_event
-
-session_id = str(uuid.uuid4())[:8]
+from utils.session import SESSION_ID
 
 
 def get_active_app():
@@ -37,7 +35,7 @@ def start_app_switch_tracker():
             print(f"Switched to: {current_app}")
 
             insert_event(
-                session_id,
+                SESSION_ID,
                 "focus_change",
                 {
                     "app": current_app

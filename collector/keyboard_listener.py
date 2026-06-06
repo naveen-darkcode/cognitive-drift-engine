@@ -1,4 +1,3 @@
-import uuid
 import time
 
 from pynput import keyboard
@@ -8,9 +7,9 @@ from database.db import (
     insert_event
 )
 
-session_id = str(uuid.uuid4())[:8]
+from utils.session import SESSION_ID
 
-print(f"\nSession Started: {session_id}\n")
+print(f"\nSession Started: {SESSION_ID}\n")
 
 pressed_keys = {}
 
@@ -24,7 +23,7 @@ def on_press(key):
     pressed_keys[key_data] = time.time()
 
     insert_event(
-        session_id,
+        SESSION_ID,
         "key_press",
         {
             "key": key_data
@@ -49,7 +48,7 @@ def on_release(key):
         dwell_time = release_time - press_time
 
         insert_keystroke(
-            session_id,
+            SESSION_ID,
             key_data,
             press_time,
             release_time,
@@ -57,7 +56,7 @@ def on_release(key):
         )
 
         insert_event(
-            session_id,
+            SESSION_ID,
             "key_release",
             {
                 "key": key_data

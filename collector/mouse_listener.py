@@ -1,14 +1,10 @@
 from pynput import mouse
-import uuid
-
 import time
+
 from database.db import insert_event
+from utils.session import SESSION_ID
 
 print("mouse_listener imported")
-
-session_id = str(uuid.uuid4())[:8]
-
-
 
 last_move_time = 0
 
@@ -24,7 +20,7 @@ def on_move(x, y):
     last_move_time = current_time
 
     insert_event(
-        session_id,
+        SESSION_ID,
         "mouse_move",
         {
             "x": x,
@@ -37,7 +33,7 @@ def on_click(x, y, button, pressed):
     print(f"CLICK: {x}, {y}")
 
     insert_event(
-        session_id,
+        SESSION_ID,
         "mouse_click",
         {
             "x": x,

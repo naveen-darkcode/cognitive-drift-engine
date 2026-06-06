@@ -1,6 +1,6 @@
 import sqlite3
 import json
-from datetime import datetime
+import time
 
 DB_NAME = "database/fatigue_logs.db"
 
@@ -13,7 +13,6 @@ def create_table():
     conn = create_connection()
     cursor = conn.cursor()
 
-    # Existing table (keep for compatibility)
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS keystrokes (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -25,23 +24,21 @@ def create_table():
     )
     """)
 
-    # New unified events table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS events (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id TEXT,
-        ts TEXT,
+        ts REAL,
         event_type TEXT,
         payload TEXT
     )
     """)
 
-    # Fatigue labels table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS fatigue_labels (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id TEXT,
-        ts TEXT,
+        ts REAL,
         label INTEGER
     )
     """)
@@ -99,7 +96,7 @@ def insert_event(
     VALUES (?, ?, ?, ?)
     """, (
         user_id,
-        datetime.now().isoformat(),
+        time.time(),
         event_type,
         json.dumps(payload)
     ))
@@ -124,7 +121,7 @@ def insert_fatigue_label(
     VALUES (?, ?, ?)
     """, (
         user_id,
-        datetime.now().isoformat(),
+        time.time(),
         label
     ))
 
