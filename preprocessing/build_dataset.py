@@ -1,6 +1,8 @@
 import sqlite3
 import pandas as pd
 
+from database.db import insert_feature_row
+
 DB_NAME = "database/fatigue_logs.db"
 
 WINDOW_SIZE = 10
@@ -46,6 +48,21 @@ def load_labels():
     conn.close()
 
     return df
+
+
+def clear_features_table():
+
+    conn = sqlite3.connect(DB_NAME)
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "DELETE FROM features"
+    )
+
+    conn.commit()
+
+    conn.close()
 
 
 def calculate_backspace_ratio(window):
@@ -153,6 +170,8 @@ def build_dataset():
 
     labels_df = load_labels()
 
+    clear_features_table()
+
     dataset_rows = []
 
     sessions = (
@@ -238,6 +257,16 @@ def build_dataset():
 
             dataset_rows.append(
                 row
+            )
+
+            insert_feature_row(
+                session_id,
+                row["iki_variance"],
+                row["backspace_ratio"],
+                row["dwell_time"],
+                row["mouse_activity"],
+                row["app_switch_rate"],
+                row["fatigue_label"]
             )
 
     dataset = pd.DataFrame(
