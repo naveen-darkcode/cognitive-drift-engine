@@ -4,6 +4,7 @@ import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
+
 import joblib
 
 
@@ -28,8 +29,13 @@ def main():
 
     df = load_features()
 
-    print("\nDataset Loaded\n")
+    print("\n===== DATASET LOADED =====\n")
+
     print(df)
+
+    print(
+        f"\nTotal Samples: {len(df)}"
+    )
 
     if len(df) < 10:
 
@@ -59,6 +65,14 @@ def main():
         random_state=42
     )
 
+    print(
+        f"\nTraining Samples: {len(X_train)}"
+    )
+
+    print(
+        f"Testing Samples: {len(X_test)}"
+    )
+
     model = RandomForestClassifier(
         n_estimators=100,
         random_state=42
@@ -82,13 +96,39 @@ def main():
         f"\nAccuracy: {accuracy:.2f}"
     )
 
+    print(
+        "\n===== FEATURE IMPORTANCE =====\n"
+    )
+
+    feature_names = [
+        "iki_variance",
+        "backspace_ratio",
+        "dwell_time",
+        "mouse_activity",
+        "app_switch_rate"
+    ]
+
+    importances = (
+        model.feature_importances_
+    )
+
+    for name, importance in zip(
+        feature_names,
+        importances
+    ):
+
+        print(
+            f"{name}: "
+            f"{importance:.4f}"
+        )
+
     joblib.dump(
         model,
         "models/fatigue_model.pkl"
     )
 
     print(
-        "\nModel saved as:"
+        "\n===== MODEL SAVED ====="
     )
 
     print(
