@@ -31,3 +31,15 @@ dist/
 
 # Streamlit Secrets
 .streamlit/secrets.toml
+# Database
+database/fatigue_logs.db
+
+# Generated datasets
+features.csv
+
+# Trained models
+models/fatigue_model.pkl
+
+# Python cache
+__pycache__/
+*.pyc
