@@ -1,0 +1,31 @@
+Dataset:
+- 51 sessions
+- 211 feature windows
+
+Model Comparison:
+Random Forest: 0.6047
+Extra Trees: 0.6744
+Gradient Boosting: 0.6512
+
+Best Model:
+Extra Trees Classifier
+
+Classification Report:
+
+HIGH:
+Precision 0.75
+Recall 0.56
+F1 0.64
+
+LOW:
+Precision 0.75
+Recall 0.30
+F1 0.43
+
+MEDIUM:
+Precision 0.63
+Recall 1.00
+F1 0.77
+
+Overall Accuracy:
+67.44%

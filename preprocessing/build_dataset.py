@@ -120,16 +120,97 @@ def calculate_iki_variance(window):
     )
 
 
+def calculate_typing_speed(window):
+
+    total_keys = len(window)
+
+    if total_keys < 2:
+        return 0
+
+    duration = (
+        window["release_time"].max()
+        - window["press_time"].min()
+    )
+
+    if duration <= 0:
+        return 0
+
+    typing_speed = (
+        total_keys / duration
+    ) * 60
+
+    return round(
+        typing_speed,
+        2
+    )
+
+
 def calculate_mouse_activity(
-    session_events
+    session_events,
+    start_time,
+    end_time
 ):
+
+    count = 0
 
     mouse_events = session_events[
         session_events["event_type"]
         == "mouse_move"
     ]
 
-    return len(mouse_events)
+    for _, row in mouse_events.iterrows():
+
+        try:
+
+            event_ts = float(
+                row["ts"]
+            )
+
+            if (
+                start_time
+                <= event_ts
+                <= end_time
+            ):
+                count += 1
+
+        except Exception:
+            pass
+
+    return count
+
+
+def calculate_click_count(
+    session_events,
+    start_time,
+    end_time
+):
+
+    count = 0
+
+    click_events = session_events[
+        session_events["event_type"]
+        == "mouse_click"
+    ]
+
+    for _, row in click_events.iterrows():
+
+        try:
+
+            event_ts = float(
+                row["ts"]
+            )
+
+            if (
+                start_time
+                <= event_ts
+                <= end_time
+            ):
+                count += 1
+
+        except Exception:
+            pass
+
+    return count
 
 
 def calculate_app_switch_rate(
@@ -221,6 +302,14 @@ def build_dataset():
             if len(window) < WINDOW_SIZE:
                 continue
 
+            window_start = (
+                window["press_time"].min()
+            )
+
+            window_end = (
+                window["release_time"].max()
+            )
+
             row = {
 
                 "session_id":
@@ -241,9 +330,23 @@ def build_dataset():
                     window
                 ),
 
+                "typing_speed":
+                calculate_typing_speed(
+                    window
+                ),
+
                 "mouse_activity":
                 calculate_mouse_activity(
-                    session_events
+                    session_events,
+                    window_start,
+                    window_end
+                ),
+
+                "click_count":
+                calculate_click_count(
+                    session_events,
+                    window_start,
+                    window_end
                 ),
 
                 "app_switch_rate":
@@ -264,7 +367,9 @@ def build_dataset():
                 row["iki_variance"],
                 row["backspace_ratio"],
                 row["dwell_time"],
+                row["typing_speed"],
                 row["mouse_activity"],
+                row["click_count"],
                 row["app_switch_rate"],
                 row["fatigue_label"]
             )

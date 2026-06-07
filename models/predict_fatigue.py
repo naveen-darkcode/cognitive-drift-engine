@@ -2,6 +2,7 @@ import sqlite3
 import pandas as pd
 import joblib
 
+
 DB_NAME = "database/fatigue_logs.db"
 
 
@@ -57,7 +58,9 @@ def main():
             "iki_variance",
             "backspace_ratio",
             "dwell_time",
+            "typing_speed",
             "mouse_activity",
+            "click_count",
             "app_switch_rate"
         ]
     ]
@@ -66,23 +69,54 @@ def main():
 
     probabilities = model.predict_proba(X)
 
-    confidence = (
-        max(probabilities[0]) * 100
+    confidence = round(
+        max(probabilities[0]) * 100,
+        1
     )
 
-    print(
-        "\n===== FATIGUE PREDICTION ====="
+    confidence = min(
+        confidence,
+        95.0
     )
 
-    print(
-        f"Predicted Fatigue Level: "
-        f"{prediction[0]}"
-    )
+    result = {
+
+        "fatigue_level":
+        str(prediction[0]),
+
+        "confidence":
+        confidence,
+
+        "features": {
+
+            "iki_variance":
+            float(df.iloc[0]["iki_variance"]),
+
+            "backspace_ratio":
+            float(df.iloc[0]["backspace_ratio"]),
+
+            "dwell_time":
+            float(df.iloc[0]["dwell_time"]),
+
+            "typing_speed":
+            float(df.iloc[0]["typing_speed"]),
+
+            "mouse_activity":
+            int(df.iloc[0]["mouse_activity"]),
+
+            "click_count":
+            int(df.iloc[0]["click_count"]),
+
+            "app_switch_rate":
+            int(df.iloc[0]["app_switch_rate"])
+        }
+    }
 
     print(
-        f"Confidence: "
-        f"{confidence:.2f}%"
+        "\n===== FATIGUE PREDICTION =====\n"
     )
+
+    print(result)
 
     print(
         "\n=============================="

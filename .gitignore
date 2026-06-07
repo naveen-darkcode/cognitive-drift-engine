@@ -1,45 +1,10 @@
-# Virtual Environment
-venv/
-.env
-
-# Python Cache
 __pycache__/
 *.pyc
-*.pyo
-*.pyd
 
-# SQLite Database
-*.db
+venv/
+.venv/
 
-# Jupyter
-.ipynb_checkpoints/
-
-# VS Code
+.idea/
 .vscode/
 
-# Logs
-*.log
-
-# OS Files
-.DS_Store
-Thumbs.db
-
-# Build Files
-build/
-dist/
-*.egg-info/
-
-# Streamlit Secrets
-.streamlit/secrets.toml
-# Database
 database/fatigue_logs.db
-
-# Generated datasets
-features.csv
-
-# Trained models
-models/fatigue_model.pkl
-
-# Python cache
-__pycache__/
-*.pyc

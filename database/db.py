@@ -1,6 +1,6 @@
 import sqlite3
 import json
-from datetime import datetime
+import time
 
 DB_NAME = "database/fatigue_logs.db"
 
@@ -65,7 +65,9 @@ def create_table():
         iki_variance REAL,
         backspace_ratio REAL,
         dwell_time REAL,
+        typing_speed REAL,
         mouse_activity INTEGER,
+        click_count INTEGER,
         app_switch_rate INTEGER,
         fatigue_label INTEGER
     )
@@ -126,7 +128,7 @@ def insert_event(
     VALUES (?, ?, ?, ?)
     """, (
         user_id,
-        datetime.now().isoformat(),
+        str(time.time()),
         event_type,
         json.dumps(payload)
     ))
@@ -152,7 +154,7 @@ def insert_fatigue_label(
     VALUES (?, ?, ?)
     """, (
         user_id,
-        datetime.now().isoformat(),
+        str(time.time()),
         label
     ))
 
@@ -194,7 +196,9 @@ def insert_feature_row(
     iki_variance,
     backspace_ratio,
     dwell_time,
+    typing_speed,
     mouse_activity,
+    click_count,
     app_switch_rate,
     fatigue_label
 ):
@@ -208,17 +212,21 @@ def insert_feature_row(
         iki_variance,
         backspace_ratio,
         dwell_time,
+        typing_speed,
         mouse_activity,
+        click_count,
         app_switch_rate,
         fatigue_label
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         session_id,
         iki_variance,
         backspace_ratio,
         dwell_time,
+        typing_speed,
         mouse_activity,
+        click_count,
         app_switch_rate,
         fatigue_label
     ))

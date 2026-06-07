@@ -2,22 +2,19 @@ import sqlite3
 import pandas as pd
 
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import (
-    accuracy_score,
-    classification_report,
-    confusion_matrix
-)
+from sklearn.model_selection import GroupShuffleSplit
+from sklearn.metrics import accuracy_score
 
 import joblib
-
 
 DB_NAME = "database/fatigue_logs.db"
 
 
 def load_features():
 
-    conn = sqlite3.connect(DB_NAME)
+    conn = sqlite3.connect(
+        DB_NAME
+    )
 
     df = pd.read_sql_query(
         "SELECT * FROM features",
@@ -29,35 +26,24 @@ def load_features():
     return df
 
 
-def convert_label(label):
-
-    if label <= 3:
-        return "LOW"
-
-    elif label <= 6:
-        return "MEDIUM"
-
-    else:
-        return "HIGH"
-
-
 def main():
 
     df = load_features()
-
-    print("\n===== DATASET LOADED =====\n")
-
-    print(df)
 
     print(
         f"\nTotal Samples: {len(df)}"
     )
 
-    if len(df) < 10:
+    print(
+        f"Total Sessions: "
+        f"{df['session_id'].nunique()}"
+    )
+
+    if len(df) < 20:
 
         print(
-            "\nNot enough training data.\n"
-            "Collect more sessions first."
+            "\nNot enough data for "
+            "session-level evaluation."
         )
 
         return
@@ -74,38 +60,63 @@ def main():
         ]
     ]
 
-    y = df["fatigue_label"].apply(
-        convert_label
-    )
+    y = df["fatigue_label"]
 
-    print(
-        "\n===== LABEL DISTRIBUTION =====\n"
-    )
+    groups = df["session_id"]
 
-    print(
-        y.value_counts()
-    )
-
-    X_train, X_test, y_train, y_test = train_test_split(
-        X,
-        y,
+    splitter = GroupShuffleSplit(
+        n_splits=1,
         test_size=0.2,
-        random_state=42,
-        stratify=y
+        random_state=42
+    )
+
+    train_idx, test_idx = next(
+        splitter.split(
+            X,
+            y,
+            groups
+        )
+    )
+
+    X_train = X.iloc[
+        train_idx
+    ]
+
+    X_test = X.iloc[
+        test_idx
+    ]
+
+    y_train = y.iloc[
+        train_idx
+    ]
+
+    y_test = y.iloc[
+        test_idx
+    ]
+
+    print(
+        f"\nTraining Samples: "
+        f"{len(X_train)}"
     )
 
     print(
-        f"\nTraining Samples: {len(X_train)}"
+        f"Testing Samples: "
+        f"{len(X_test)}"
     )
 
     print(
-        f"Testing Samples: {len(X_test)}"
+        f"Training Sessions: "
+        f"{df.iloc[train_idx]['session_id'].nunique()}"
+    )
+
+    print(
+        f"Testing Sessions: "
+        f"{df.iloc[test_idx]['session_id'].nunique()}"
     )
 
     model = RandomForestClassifier(
-      n_estimators=200,
-      class_weight="balanced",
-      random_state=42
+        n_estimators=200,
+        random_state=42
     )
 
     model.fit(
@@ -123,30 +134,8 @@ def main():
     )
 
     print(
-        f"\nAccuracy: {accuracy:.4f}"
-    )
-
-    print(
-        "\n===== CLASSIFICATION REPORT =====\n"
-    )
-
-    print(
-        classification_report(
-         y_test,
-         predictions,
-         zero_division=0
-        )
-    )
-
-    print(
-        "\n===== CONFUSION MATRIX =====\n"
-    )
-
-    print(
-        confusion_matrix(
-            y_test,
-            predictions
-        )
+        f"\nSession-Level Accuracy: "
+        f"{accuracy:.4f}"
     )
 
     print(
@@ -163,13 +152,9 @@ def main():
         "app_switch_rate"
     ]
 
-    importances = (
-        model.feature_importances_
-    )
-
     for name, importance in zip(
         feature_names,
-        importances
+        model.feature_importances_
     ):
 
         print(
@@ -179,7 +164,7 @@ def main():
 
     joblib.dump(
         model,
-        "models/fatigue_model.pkl"
+        "models/fatigue_model_session.pkl"
     )
 
     print(
@@ -187,7 +172,7 @@ def main():
     )
 
     print(
-        "models/fatigue_model.pkl"
+        "models/fatigue_model_session.pkl"
     )
 
 
